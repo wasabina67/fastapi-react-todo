@@ -40,6 +40,20 @@ function App() {
     }
   }
 
+  const handleToggle = async (todo: TodoResponse) => {
+    const { data, error } = await client.PATCH('/api/todos/{todo_id}', {
+      params: { path: { todo_id: todo.id } },
+      body: { completed: !todo.completed },
+    })
+    if (error) {
+      console.error('Failed to update todo:', error)
+      return
+    }
+    if (data) {
+      setTodos(todos.map((t) => (t.id === data.id ? data : t)))
+    }
+  }
+
   return (
     <div className="app">
       <h1>FastAPI React Todo</h1>
@@ -58,7 +72,14 @@ function App() {
         <ul className="todo-list">
           {todos.map((todo) => (
             <li key={todo.id} className={todo.completed ? 'completed' : ''}>
-              <span>{todo.name}</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => handleToggle(todo)}
+                />
+                <span>{todo.name}</span>
+              </label>
             </li>
           ))}
         </ul>
