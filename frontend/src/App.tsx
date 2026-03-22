@@ -7,6 +7,7 @@ type TodoResponse = apiSchema['schemas']['TodoResponse']
 
 function App() {
   const [todos, setTodos] = useState<TodoResponse[]>([])
+  const [newTodoName, setNewTodoName] = useState('')
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -22,9 +23,35 @@ function App() {
     fetchTodos()
   }, [])
 
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const trimmed = newTodoName.trim()
+    if (!trimmed) return
+    const { data, error } = await client.POST('/api/todos/', {
+      body: { name: trimmed },
+    })
+    if (error) {
+      console.error('Failed to create todo:', error)
+      return
+    }
+    if (data) {
+      setTodos([data, ...todos])
+      setNewTodoName('')
+    }
+  }
+
   return (
     <div className="app">
       <h1>FastAPI React Todo</h1>
+      <form className="todo-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={newTodoName}
+          onChange={(e) => setNewTodoName(e.target.value)}
+          placeholder="Add a new todo..."
+        />
+        <button type="submit">Add</button>
+      </form>
       {todos.length === 0 ? (
         <p>No todos yet.</p>
       ) : (
