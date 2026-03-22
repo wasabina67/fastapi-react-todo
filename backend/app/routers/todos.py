@@ -11,7 +11,7 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 
 @router.get("/", response_model=list[TodoResponse])
 async def get_todos(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Todo))
+    result = await db.execute(select(Todo).order_by(Todo.id.desc()))
     return result.scalars().all()
 
 
