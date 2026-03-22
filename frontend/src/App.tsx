@@ -54,6 +54,17 @@ function App() {
     }
   }
 
+  const handleDelete = async (todoId: number) => {
+    const { error } = await client.DELETE('/api/todos/{todo_id}', {
+      params: { path: { todo_id: todoId } },
+    })
+    if (error) {
+      console.error('Failed to delete todo:', error)
+      return
+    }
+    setTodos(todos.filter((t) => t.id !== todoId))
+  }
+
   return (
     <div className="app">
       <h1>FastAPI React Todo</h1>
@@ -80,6 +91,7 @@ function App() {
                 />
                 <span>{todo.name}</span>
               </label>
+              <button onClick={() => handleDelete(todo.id)}>Delete</button>
             </li>
           ))}
         </ul>
